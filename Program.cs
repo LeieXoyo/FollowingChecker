@@ -1,10 +1,10 @@
-﻿using static ExtractProfile;
+﻿using FollowingChecker;
 
 if (args.Length == 1)
 {
     var userName = args[0];
-    var followers = await ExtractFollow($"https://github.com/{userName}?tab=followers");
-    var following = await ExtractFollow($"https://github.com/{userName}?tab=following");
+    var followers = await ExtractHelper.ExtractFollow($"https://github.com/{userName}?tab=followers");
+    var following = await ExtractHelper.ExtractFollow($"https://github.com/{userName}?tab=following");
     following.ExceptWith(followers);
     Console.WriteLine($"关注了对方而没被对方关注的:\n[ {string.Join(" || ", following)} ]");
 }

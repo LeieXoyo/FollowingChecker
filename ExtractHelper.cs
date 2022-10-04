@@ -1,13 +1,14 @@
 using System.Text.RegularExpressions;
 
-static class ExtractProfile
-{
+namespace FollowingChecker;
 
-    private static readonly HttpClient httpClient = new HttpClient();
+internal static class ExtractHelper
+{
+    private static readonly HttpClient HttpClient = new HttpClient();
     
     internal static async Task<HashSet<string>> ExtractFollow(string url)
     {
-        var responseBody = await getResponseBody(url);
+        var responseBody = await GetResponseBody(url);
         var results = new HashSet<string>();
         var followsPattern = new Regex(@"<span class=""Link--secondary.*?"">(.*?)</span>");
         var nextButtonPattern = new Regex(@"Previous</\w*?><a rel=""nofollow"" href=""(https://github.com/.*?)"">Next</a>");
@@ -19,7 +20,7 @@ static class ExtractProfile
         var nextButtonMatch = nextButtonPattern.Match(responseBody);
         while (nextButtonMatch.Success)
         {
-            responseBody = await getResponseBody(nextButtonMatch.Groups[1].Value);
+            responseBody = await GetResponseBody(nextButtonMatch.Groups[1].Value);
             matches = followsPattern.Matches(responseBody);
             foreach (Match match in matches)
             {
@@ -30,14 +31,14 @@ static class ExtractProfile
         return results;
     }
     
-    private static async Task<string> getResponseBody(string url)
+    private static async Task<string> GetResponseBody(string url)
     {
-        string responseBody = string.Empty;
+        var responseBody = string.Empty;
         while (responseBody == string.Empty)
         {
             try
             {
-                HttpResponseMessage response = await httpClient.GetAsync(url);
+                HttpResponseMessage response = await HttpClient.GetAsync(url);
                 response.EnsureSuccessStatusCode();
                 responseBody = await response.Content.ReadAsStringAsync();   
             }
